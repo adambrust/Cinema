@@ -3,23 +3,27 @@ using Cinema.Persistance;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Cinema.Features.Movies;
+namespace Cinema.Features.Tickets;
 
-public sealed class DeleteMovies : ICarterModule
+public sealed class DeleteTicket : ICarterModule
 {
     private static async Task<IResult> Handle(
         Guid id,
         [FromServices] CinemaDbContext db,
         CancellationToken cancellationToken)
     {
-        var movie = await db.Movies.SingleOrDefaultAsync(m => m.Id == id, cancellationToken);
+        var ticket = await db.Tickets.SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
 
-        if (movie is null)
+        if (ticket is null)
         {
             return Results.NotFound(id);
         }
 
-        db.Movies.Remove(movie);
+        var screening = await db.Screenings.SingleAsync(s => s.Id == ticket.Screening.Id, cancellationToken);
+
+        screening.ReservedSits.RemoveWhere(ticket.Sits.Contains);
+
+        db.Tickets.Remove(ticket);
 
         await db.SaveChangesAsync(cancellationToken);
 
@@ -28,6 +32,6 @@ public sealed class DeleteMovies : ICarterModule
 
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("movies/{id:guid}", Handle).RequireAuthorization("Admin");
+        app.MapDelete("ticets/{id:guid}", Handle).RequireAuthorization();
     }
 }

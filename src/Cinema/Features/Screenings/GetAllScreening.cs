@@ -3,21 +3,21 @@ using Cinema.Persistance;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Cinema.Features.Movies;
+namespace Cinema.Features.Screenings;
 
-public sealed class GetAllMovies : ICarterModule
+public sealed class GetAllScreening : ICarterModule
 {
     private static async Task<IResult> Handle(
         [FromServices] CinemaDbContext db,
         CancellationToken cancellationToken)
     {
-        var movies = await db.Movies.AsNoTracking().ToListAsync(cancellationToken);
+        var screenings = await db.Screenings.AsNoTracking().ToListAsync(cancellationToken);
 
-        return Results.Ok(movies);
+        return Results.Ok(screenings);
     }
 
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("movies", Handle);
+        app.MapGet("screenings", Handle);
     }
 }

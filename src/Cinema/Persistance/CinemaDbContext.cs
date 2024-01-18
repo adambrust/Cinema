@@ -1,18 +1,19 @@
-﻿using Cinema.Features.Halls;
-using Cinema.Features.Movies;
+﻿using Cinema.Features.Movies;
 using Cinema.Features.Screenings;
+using Cinema.Features.Tickets;
+using Cinema.Features.Users;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinema.Persistance;
 
-public sealed class CinemaDbContext : DbContext
+public sealed class CinemaDbContext(
+    DbContextOptions<CinemaDbContext> options)
+    : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options)
 {
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-    {
-        options.UseNpgsql("Data Source=perifen.ddns.net,5432;Integrated Security=false;User ID=postgres;Password=zaq1@WSX;");
-    }
-
     public DbSet<Movie> Movies { get; set; } = null!;
     public DbSet<Screening> Screenings { get; set; } = null!;
     public DbSet<Hall> Halls { get; set; } = null!;
+    public DbSet<Ticket> Tickets { get; set; } = null!;
 }

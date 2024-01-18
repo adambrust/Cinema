@@ -1,15 +1,16 @@
 ﻿using Carter;
 using Cinema.Persistance;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinema.Features.Screenings;
 
-internal class Delete : ICarterModule
+public sealed class DeleteScreening : ICarterModule
 {
     private static async Task<IResult> Handle(
         Guid id,
-        CinemaDbContext db,
+        [FromServices] CinemaDbContext db,
         CancellationToken cancellationToken)
     {
         var screening = await db.Screenings.SingleOrDefaultAsync(s => s.Id == id, cancellationToken);
@@ -19,15 +20,18 @@ internal class Delete : ICarterModule
             return Results.NotFound(id);
         }
 
+        var tickets = db.Tickets.Where(t => t.Screening.Id == id);
+
+        db.Tickets.RemoveRange(tickets);
         db.Screenings.Remove(screening);
 
         await db.SaveChangesAsync(cancellationToken);
 
-        return Results.Created("api/screenings", screening.Id);
+        return Results.Ok();
     }
 
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("api/screenings/{id:guid}", Handle).WithName("DeleteScreening").WithOpenApi();
+        app.MapDelete("screenings/{id:guid}", Handle).RequireAuthorization("Admin");
     }
 }

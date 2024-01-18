@@ -1,30 +1,13 @@
 ﻿using Cinema.Features.Common;
 using Cinema.Features.Screenings;
+using Cinema.Features.Users;
 
 namespace Cinema.Features.Tickets;
 
-public sealed class Ticket : Entity
+public sealed class Ticket(Guid id, User user, Screening screening, HashSet<Sit> sits) : IEntity
 {
-    public Guid UserId { get; private set; }
-    public Guid ShowId { get; private set; }
-    public List<Sit> Sits { get; private set; }
-    public TicketStatus Status { get; private set; }
-
-    private Ticket(Guid id, Guid userId, Guid showId, List<Sit> sits, TicketStatus status) : base(id)
-    {
-        UserId = userId;
-        ShowId = showId;
-        Sits = sits;
-        Status = status;
-    }
-
-    public static Ticket Create(Guid userId, Guid showId, List<Sit> sits)
-    {
-        return new Ticket(Guid.NewGuid(), userId, showId, sits, TicketStatus.Active);
-    }
-
-    public void Cancel()
-    {
-        Status = TicketStatus.Canceled;
-    }
+    public Guid Id { get; set; } = id;
+    public User User { get; set; } = user;
+    public Screening Screening { get; set; } = screening;
+    public HashSet<Sit> Sits { get; set; } = sits;
 }

@@ -1,12 +1,15 @@
 ﻿using Carter;
 using Cinema.Persistance;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Cinema.Features.Halls;
+namespace Cinema.Features.Screenings;
 
-internal sealed class GetAllHalls : ICarterModule
+public sealed class GetAllHalls : ICarterModule
 {
-    private static async Task<IResult> Handle(CinemaDbContext db, CancellationToken cancellationToken)
+    private static async Task<IResult> Handle(
+        [FromServices] CinemaDbContext db,
+        CancellationToken cancellationToken)
     {
         var halls = await db.Halls.AsNoTracking().Select(h => h.Number).ToListAsync(cancellationToken);
 
@@ -15,6 +18,6 @@ internal sealed class GetAllHalls : ICarterModule
 
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/halls", Handle).WithName("GetAllHalls").WithOpenApi();
+        app.MapGet("halls", Handle);
     }
 }

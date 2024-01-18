@@ -1,4 +1,6 @@
-﻿namespace Cinema.Features.Common;
+﻿using Cinema.Features.Common;
+
+namespace Cinema.Services;
 
 public class DateTimeProvider : IDateTimeProvider
 {

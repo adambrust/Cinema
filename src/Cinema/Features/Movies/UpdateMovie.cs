@@ -1,13 +1,18 @@
 ﻿using Carter;
 using Cinema.Persistance;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinema.Features.Movies;
 
-internal sealed class Update : ICarterModule
+public sealed class UpdateMovie : ICarterModule
 {
-    private sealed record Command(string Title, string Description, TimeSpan Duration);
+    private sealed record Command(
+        string Title,
+        string Description,
+        TimeSpan Duration,
+        string Image);
 
     private sealed class Validator : AbstractValidator<Command>
     {
@@ -16,14 +21,15 @@ internal sealed class Update : ICarterModule
             RuleFor(c => c.Title).NotEmpty();
             RuleFor(c => c.Description).NotEmpty();
             RuleFor(c => c.Duration).NotEmpty();
+            RuleFor(c => c.Image).NotEmpty();
         }
     }
 
     private static async Task<IResult> Handle(
         Guid id,
-        Command command,
-        CinemaDbContext db,
-        IValidator<Command> validator,
+        [FromBody] Command command,
+        [FromServices] CinemaDbContext db,
+        [FromServices] IValidator<Command> validator,
         CancellationToken cancellationToken)
     {
         var validationResult = validator.Validate(command);
@@ -40,7 +46,10 @@ internal sealed class Update : ICarterModule
             return Results.NotFound(id);
         }
 
-        movie.Update(command.Title, command.Description, command.Duration);
+        movie.Title = command.Title;
+        movie.Description = command.Description;
+        movie.Duration = command.Duration;
+        movie.Image = command.Image;
 
         db.Movies.Update(movie);
 
@@ -51,6 +60,6 @@ internal sealed class Update : ICarterModule
 
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/movies/{id:guid}", Handle).WithName("UpdateMovie").WithOpenApi();
+        app.MapPut("movies/{id:guid}", Handle).RequireAuthorization("Admin");
     }
 }
