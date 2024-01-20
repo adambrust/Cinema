@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+    <title>Rezerwacja Miejsc Kinowych</title>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="reservations.html">
+                        <i class="fas fa-user"></i> Moje Rezerwacje
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-sign-out-alt"></i> Wyloguj się
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="main-adm.html">
+                        <i class="fas fa-sign-out-alt"></i>Strona główna
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container movie-details">
+        <h2>Nazwa Filmu: Tytuł Filmu</h2>
+        <p>Godzina: 18:00</p>
+
+        <h3>Wybierz miejsce:</h3>
+        <div class="seat-container" id="seatContainer">
+            <!-- Miejsca kinowe będą tutaj -->
+        </div>
+
+        <div class="btn-container">
+            <button class="btn btn-primary" onclick="reserveSeats()">Zarezerwuj</button>
+            <button class="btn btn-danger" onclick="cancelReservation()">Anuluj rezerwację</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+		const urlParams = new URLSearchParams(window.location.search);
+
+		const id = urlParams.get('id');
+
+		console.log(id);
+		
+		var requestOptions = {
+			method: 'GET'
+		}
+		
+		fetch('https://localhost:7296/screenings', requestOptions)
+			.then(response => response.json())
+			.then(data => {
+				console.log(data);
+			})
+			.catch(error => {
+				console.error('Błąd:', error);
+			});
+	
+        const totalSeats = 50;
+        const seatsContainer = document.getElementById('seatContainer');
+
+        for (let i = 1; i <= totalSeats; i++) {
+            const seat = document.createElement('div');
+            seat.className = 'seat';
+            seat.textContent = i;
+            seat.addEventListener('click', toggleSeat);
+            seatsContainer.appendChild(seat);
+        }
+
+        function toggleSeat() {
+            this.classList.toggle('selected');
+        }
+
+        function reserveSeats() {
+            const selectedSeats = document.querySelectorAll('.seat.selected');
+            if (selectedSeats.length > 0) {
+                alert(`Zarezerwowano miejsca: ${Array.from(selectedSeats).map(seat => seat.textContent).join(', ')}`);
+            } else {
+                alert('Proszę wybrać miejsce przed rezerwacją.');
+            }
+        }
+
+        function cancelReservation() {
+            const selectedSeats = document.querySelectorAll('.seat.selected');
+            selectedSeats.forEach(seat => seat.classList.remove('selected'));
+            alert('Anulowano rezerwację.');
+        }
+    </script>
+</body>
+</html>

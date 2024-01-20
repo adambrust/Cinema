@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administracyjny - Serwis Kinowy</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+
+    <style>
+        body {
+            color: white;
+        }
+    </style>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="reservations.html">
+                        <i class="fas fa-user"></i> Moje Rezerwacje
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-sign-out-alt"></i> Wyloguj się
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-sign-out-alt"></i>Ustawienia
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="main-adm.html">
+                        <i class="fas fa-sign-out-alt"></i>Strona główna
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h2 class="mb-4">Panel Administracyjny - Serwis Kinowy</h2>
+
+        <!-- Sekcja Dodawania Filmu -->
+        <div class="card">
+            <div class="card-header">
+                Dodaj Film
+            </div>
+            <div class="card-body">
+                <!-- Formularz dodawania filmu -->
+                <form id="addMovie">
+                    <div class="form-group">
+                        <label for="tytul">Tytuł filmu:</label>
+                        <input type="text" class="form-control" id="tytul" placeholder="Wprowadź tytuł">
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Opis filmu:</label>
+                        <input type="text" class="form-control" id="description" placeholder="Wprowadź opis filmu">
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Czas trwania:</label>
+                        <input type="number" class="form-control" id="duration" placeholder="Czas trwania">
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Link do obrazu:</label>
+                        <input type="text" class="form-control" id="image" placeholder="link">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Dodaj Film</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sekcja Usuwania Filmu -->
+        <div class="card mt-4">
+            <div class="card-header">
+                Usuń Film
+            </div>
+            <div class="card-body">
+                <!-- Formularz usuwania filmu -->
+                <form id="deleteMovie">
+                    <div class="form-group">
+                        <label for="idFilmuUsuwanie">ID Filmu:</label>
+                        <input type="text" class="form-control" id="idFilmuUsuwanie" placeholder="Wprowadź ID filmu">
+                    </div>
+                    <button type="submit" class="btn btn-danger">Usuń Film</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sekcja Zmiany Filmu -->
+        <div class="card mt-4">
+            <div class="card-header">
+                Zmień Film? idk
+            </div>
+            <div class="card-body">
+                <!-- Formularz zmiany filmu -->
+                <form id="updateMovie">
+                    <div class="form-group">
+                        <label for="idFilmuZmiana">ID Filmu:</label>
+                        <input type="text" class="form-control" id="idFilmuZmiana" placeholder="Wprowadź ID filmu">
+                    </div>
+                    <div class="form-group">
+                        <label for="nowyTytul">Nowy Tytuł:</label>
+                        <input type="text" class="form-control" id="nowyTytul" placeholder="Wprowadź nowy tytuł">
+                    </div>
+                    <div class="form-group">
+                        <label for="nowyOpis">Nowy Opis</label>
+                        <input type="text" class="form-control" id="nowyOpis" placeholder="Wprowadź nowy opis">
+                    </div>
+					<div class="form-group">
+                        <label for="nowyCzasTrwania">Nowy Czas Trwania</label>
+                        <input type="number" class="form-control" id="nowyCzasTrwania" placeholder="Czas Trwania">
+                    </div>
+					<div class="form-group">
+                        <label for="nowyObraz">Nowy Obraz</label>
+                        <input type="text" class="form-control" id="nowyObraz" placeholder="Link">
+                    </div>
+                    <button type="submit" class="btn btn-warning">Zmień Film</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('addMovie').addEventListener('submit', function (e) {
+            e.preventDefault();
+            console.log(sessionStorage.getItem('token'));
+			var dataToSend = {
+				title: document.getElementById('tytul').value,
+				description: document.getElementById('description').value,
+				duration: document.getElementById('duration').value,
+				image: document.getElementById('image').value
+			};
+			
+            var requestOptions = {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+				},
+				body: JSON.stringify(dataToSend)
+			}
+			
+			fetch('https://localhost:7296/movies', requestOptions)
+				.then(response => response.json())
+				.then(data => {
+					console.log(data);
+				})
+				.catch(error => {
+					console.error('Błąd:', error);
+				});
+        });
+		
+		document.getElementById('deleteMovie').addEventListener('submit', function (e) {
+            e.preventDefault();
+			
+            console.log(sessionStorage.getItem('token'));
+			var requestOptions = {
+				method: 'DELETE',
+				headers: {
+					'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+				}
+			}
+			
+			fetch('https://localhost:7296/movies/' + document.getElementById('idFilmuUsuwanie').value, requestOptions)
+				.then(response => console.log(response))
+				.catch(error => {
+					console.error('Błąd:', error);
+				});
+        });
+		
+		document.getElementById('updateMovie').addEventListener('submit', function (e) {
+            e.preventDefault();
+			
+            console.log(sessionStorage.getItem('token'));
+			
+			var dataToSend = {
+				id: document.getElementById('idFilmuZmiana').value,
+				title: document.getElementById('nowyTytul').value,
+				description: document.getElementById('nowyOpis').value,
+				duration: document.getElementById('nowyCzasTrwania').value,
+				image: document.getElementById('nowyObraz').value
+			};
+			
+            var requestOptions = {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+				},
+				body: JSON.stringify(dataToSend)
+			}
+			
+			fetch('https://localhost:7296/movies/' + document.getElementById('idFilmuZmiana').value, requestOptions)
+				.then(response => response.json())
+				.then(data => {
+					console.log(data);
+				})
+				.catch(error => {
+					console.error('Błąd:', error);
+				});
+        });
+    </script>
+</body>
+</html>

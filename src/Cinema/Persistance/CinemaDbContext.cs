@@ -16,4 +16,11 @@ public sealed class CinemaDbContext(
     public DbSet<Screening> Screenings { get; set; } = null!;
     public DbSet<Hall> Halls { get; set; } = null!;
     public DbSet<Ticket> Tickets { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.Entity<Sit>().HasKey(s => new { s.Row, s.Column });
+    }
 }

@@ -3,17 +3,11 @@ using Cinema.Features.Movies;
 
 namespace Cinema.Features.Screenings;
 
-public sealed class Screening(
-    Guid id,
-    Movie movie,
-    Hall hall,
-    DateTime time,
-    HashSet<Sit> reservedSits)
-    : IEntity
+public sealed class Screening : IEntity
 {
-    public Guid Id { get; set; } = id;
-    public Movie Movie { get; set; } = movie;
-    public Hall Hall { get; set; } = hall;
-    public DateTime Time { get; set; } = time;
-    public HashSet<Sit> ReservedSits { get; set; } = reservedSits;
+    public Guid Id { get; set; }
+    public Movie Movie { get; set; } = null!;
+    public Hall Hall { get; set; } = null!;
+    public DateTime Time { get; set; }
+    public List<Sit> ReservedSits { get; set; } = [];
 }

@@ -1,6 +1,6 @@
 ﻿using Cinema.Features.Common;
 
-namespace Cinema.Services;
+namespace Cinema.Persistance;
 
 public class DateTimeProvider : IDateTimeProvider
 {

@@ -2,9 +2,9 @@
 
 namespace Cinema.Features.Screenings;
 
-public sealed class Hall(Guid id, int number, HashSet<Sit> sits) : IEntity
+public sealed class Hall : IEntity
 {
-    public Guid Id { get; set; } = id;
-    public int Number { get; set; } = number;
-    public HashSet<Sit> Sits { get; set; } = sits;
+    public Guid Id { get; set; }
+    public int Number { get; set; }
+    public List<Sit> Sits { get; set; } = [];
 }

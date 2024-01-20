@@ -1,7 +1,3 @@
 ﻿namespace Cinema.Features.Screenings;
 
-public readonly struct Sit
-{
-    public readonly int row;
-    public readonly int column;
-}
+public sealed record Sit(int Row, int Column);

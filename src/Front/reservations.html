@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moje Rezerwacje - Serwis Kinowy</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-user"></i> Moje Rezerwacje
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-sign-out-alt"></i> Wyloguj się
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-sign-out-alt"></i> Strona główna
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h2 class="mb-4">Moje Rezerwacje - Serwis Kinowy</h2>
+
+        <!-- Tabela z rezerwacjami -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID Rezerwacji</th>
+                    <th>Tytuł Filmu</th>
+                    <th>Data</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Przykładowe dane - do zastąpienia rzeczywistymi danymi z bazy danych -->
+                <tr>
+                    <td>1</td>
+                    <td>Przykładowy Film 1</td>
+                    <td>2024-01-18 16:69</td>
+                    <td>
+
+                        <button type="button" class="btn btn-danger btn-sm" onclick="usunRezerwacje(1)">Usuń</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Przykładowy Film 2</td>
+                    <td>2024-01-19 18:00</td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="usunRezerwacje(2)">Usuń</button>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    <script>
+        function usunRezerwacje(idRezerwacji) {
+            alert("Rezerwacja o ID " + idRezerwacji + " została usunięta.");
+        }
+    </script>
+
+</body></html>

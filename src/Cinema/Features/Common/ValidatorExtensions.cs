@@ -8,11 +8,14 @@ public static class ValidatorExtensions
 {
     public static IRuleBuilderOptions<T, Guid> IdExist<T, TEntity>(
         this IRuleBuilder<T, Guid> ruleBuilder,
-        CinemaDbContext db)
+        IServiceProvider serviceProvider)
         where TEntity : class, IEntity
     {
         return ruleBuilder.MustAsync((id, cancellationToken) =>
-                db.Set<TEntity>().AsNoTracking().AnyAsync(e => e.Id == id, cancellationToken)
-            ).WithMessage($"{nameof(TEntity)} does not exits");
+        {
+            using var scope = serviceProvider.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
+            return db.Set<TEntity>().AsNoTracking().AnyAsync(e => e.Id == id, cancellationToken);
+        }).WithMessage($"{nameof(TEntity)} does not exits");
     }
 }

@@ -2,17 +2,11 @@
 
 namespace Cinema.Features.Movies;
 
-public sealed class Movie(
-    Guid id,
-    string title,
-    string description,
-    TimeSpan duration,
-    string image)
-    : IEntity
+public sealed class Movie : IEntity
 {
-    public Guid Id { get; set; } = id;
-    public string Title { get; set; } = title;
-    public string Description { get; set; } = description;
-    public TimeSpan Duration { get; set; } = duration;
-    public string Image { get; set; } = image;
+    public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public TimeSpan Duration { get; set; }
+    public string Image { get; set; } = string.Empty;
 }

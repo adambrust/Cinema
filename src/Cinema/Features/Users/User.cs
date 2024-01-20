@@ -5,4 +5,8 @@ namespace Cinema.Features.Users;
 
 public sealed class User : IdentityUser<Guid>, IEntity
 {
+    public User() : base()
+    {
+        Id = Guid.NewGuid();
+    }
 }
