@@ -13,7 +13,11 @@ public sealed class GetTicketByIdRequestHandler(CinemaDbContext db)
 {
     public async Task<IResult> Handle(GetTicketByIdRequest request, CancellationToken cancellationToken)
     {
-        var ticket = await db.Tickets.AsNoTracking()
+        var ticket = await db.Tickets
+            .AsNoTracking()
+            .Include(t => t.User)
+            .Include(t => t.Screening)
+            .Include(t => t.Sits)
             .SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
 
         if (ticket is null)

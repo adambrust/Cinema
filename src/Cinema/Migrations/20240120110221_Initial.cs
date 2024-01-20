@@ -52,18 +52,6 @@ namespace Cinema.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Halls",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Number = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Halls", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Movies",
                 columns: table => new
                 {
@@ -76,6 +64,19 @@ namespace Cinema.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Movies", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sits",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Row = table.Column<int>(type: "integer", nullable: false),
+                    Column = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sits", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -190,22 +191,39 @@ namespace Cinema.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     MovieId = table.Column<Guid>(type: "uuid", nullable: false),
-                    HallId = table.Column<Guid>(type: "uuid", nullable: false),
                     Time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Screenings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Screenings_Halls_HallId",
-                        column: x => x.HallId,
-                        principalTable: "Halls",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Screenings_Movies_MovieId",
                         column: x => x.MovieId,
                         principalTable: "Movies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ScreeningSit",
+                columns: table => new
+                {
+                    ReservedSitsId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ScreeningId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScreeningSit", x => new { x.ReservedSitsId, x.ScreeningId });
+                    table.ForeignKey(
+                        name: "FK_ScreeningSit_Screenings_ScreeningId",
+                        column: x => x.ScreeningId,
+                        principalTable: "Screenings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ScreeningSit_Sits_ReservedSitsId",
+                        column: x => x.ReservedSitsId,
+                        principalTable: "Sits",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -236,33 +254,27 @@ namespace Cinema.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Sit",
+                name: "SitTicket",
                 columns: table => new
                 {
-                    Row = table.Column<int>(type: "integer", nullable: false),
-                    Column = table.Column<int>(type: "integer", nullable: false),
-                    HallId = table.Column<Guid>(type: "uuid", nullable: true),
-                    ScreeningId = table.Column<Guid>(type: "uuid", nullable: true),
-                    TicketId = table.Column<Guid>(type: "uuid", nullable: true)
+                    SitsId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TicketId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Sit", x => new { x.Row, x.Column });
+                    table.PrimaryKey("PK_SitTicket", x => new { x.SitsId, x.TicketId });
                     table.ForeignKey(
-                        name: "FK_Sit_Halls_HallId",
-                        column: x => x.HallId,
-                        principalTable: "Halls",
-                        principalColumn: "Id");
+                        name: "FK_SitTicket_Sits_SitsId",
+                        column: x => x.SitsId,
+                        principalTable: "Sits",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Sit_Screenings_ScreeningId",
-                        column: x => x.ScreeningId,
-                        principalTable: "Screenings",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Sit_Tickets_TicketId",
+                        name: "FK_SitTicket_Tickets_TicketId",
                         column: x => x.TicketId,
                         principalTable: "Tickets",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -303,9 +315,9 @@ namespace Cinema.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Screenings_HallId",
-                table: "Screenings",
-                column: "HallId");
+                name: "IX_ScreeningSit_ScreeningId",
+                table: "ScreeningSit",
+                column: "ScreeningId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Screenings_MovieId",
@@ -313,18 +325,8 @@ namespace Cinema.Migrations
                 column: "MovieId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sit_HallId",
-                table: "Sit",
-                column: "HallId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Sit_ScreeningId",
-                table: "Sit",
-                column: "ScreeningId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Sit_TicketId",
-                table: "Sit",
+                name: "IX_SitTicket_TicketId",
+                table: "SitTicket",
                 column: "TicketId");
 
             migrationBuilder.CreateIndex(
@@ -357,10 +359,16 @@ namespace Cinema.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Sit");
+                name: "ScreeningSit");
+
+            migrationBuilder.DropTable(
+                name: "SitTicket");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Sits");
 
             migrationBuilder.DropTable(
                 name: "Tickets");
@@ -370,9 +378,6 @@ namespace Cinema.Migrations
 
             migrationBuilder.DropTable(
                 name: "Screenings");
-
-            migrationBuilder.DropTable(
-                name: "Halls");
 
             migrationBuilder.DropTable(
                 name: "Movies");

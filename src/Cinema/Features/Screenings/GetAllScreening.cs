@@ -13,7 +13,11 @@ public sealed class GetAllScreeningRequestHandler(CinemaDbContext db)
 {
     public async Task<IResult> Handle(GetAllScreeningRequest request, CancellationToken cancellationToken)
     {
-        var screenings = await db.Screenings.AsNoTracking().ToListAsync(cancellationToken);
+        var screenings = await db.Screenings
+            .AsNoTracking()
+            .Include(s => s.Movie)
+            .Include(s => s.ReservedSits)
+            .ToListAsync(cancellationToken);
 
         return Results.Ok(screenings.ToViewModel());
     }
@@ -28,6 +32,6 @@ public sealed class GetAllScreening : ICarterModule
             CancellationToken cancellationToken) =>
                 await sender.Send(new GetAllScreeningRequest(), cancellationToken))
             .WithOpenApi()
-            .Produces<IEnumerable<ScreeningListViewModel>>(200);
+            .Produces<IEnumerable<ScreeningViewModel>>(200);
     }
 }

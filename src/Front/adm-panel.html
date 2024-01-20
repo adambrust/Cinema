@@ -28,13 +28,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="index.html">
                         <i class="fas fa-sign-out-alt"></i> Wyloguj się
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-sign-out-alt"></i>Ustawienia
                     </a>
                 </li>
                 <li class="nav-item">
@@ -70,7 +65,7 @@
                     </div>
                     <div class="form-group">
                         <label for="image">Link do obrazu:</label>
-                        <input type="text" class="form-control" id="image" placeholder="link">
+                        <input type="text" class="form-control" id="image" placeholder="Wprowadź link">
                     </div>
                     <button type="submit" class="btn btn-primary">Dodaj Film</button>
                 </form>
@@ -86,8 +81,8 @@
                 <!-- Formularz usuwania filmu -->
                 <form id="deleteMovie">
                     <div class="form-group">
-                        <label for="idFilmuUsuwanie">ID Filmu:</label>
-                        <input type="text" class="form-control" id="idFilmuUsuwanie" placeholder="Wprowadź ID filmu">
+                        <label for="idFilmuUsuwanie">Film:</label>
+						<select class="form-control" id="idFilmuUsuwanie"></select>
                     </div>
                     <button type="submit" class="btn btn-danger">Usuń Film</button>
                 </form>
@@ -97,14 +92,14 @@
         <!-- Sekcja Zmiany Filmu -->
         <div class="card mt-4">
             <div class="card-header">
-                Zmień Film? idk
+                Zmień Film
             </div>
             <div class="card-body">
                 <!-- Formularz zmiany filmu -->
                 <form id="updateMovie">
                     <div class="form-group">
-                        <label for="idFilmuZmiana">ID Filmu:</label>
-                        <input type="text" class="form-control" id="idFilmuZmiana" placeholder="Wprowadź ID filmu">
+                        <label for="idFilmuZmiana">Filmu:</label>
+						<select class="form-control" id="idFilmuZmiana"></select>
                     </div>
                     <div class="form-group">
                         <label for="nowyTytul">Nowy Tytuł:</label>
@@ -126,15 +121,93 @@
                 </form>
             </div>
         </div>
+		
+		<!-- Sekcja Dodawania Repertuaru -->
+        <div class="card mt-4">
+            <div class="card-header">
+                Dodaj Repertuar
+            </div>
+            <div class="card-body">
+                <!-- Formularz dodawania repertuaru -->
+                <form id="addScreening">
+					<div class="form-group">
+                        <label for="film">Film:</label>
+						<select class="form-control" id="film"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="data">Data:</label>
+                        <input type="date" class="form-control" id="data">
+                    </div>
+					<div class="form-group">
+                        <label for="time">Data:</label>
+                        <input type="time" class="form-control" id="time">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Dodaj Repertuar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sekcja Usuwania Repertuaru -->
+        <div class="card mt-4">
+            <div class="card-header">
+                Usuń Repertuar
+            </div>
+            <div class="card-body">
+                <!-- Formularz usuwania Repertuaru -->
+                <form id="deleteScreening">
+                    <div class="form-group">
+                        <label for="repertuar">Repertuar:</label>
+						<select class="form-control" id="repertuar"></select>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Usuń Repertuar</button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+		var getRequest = {
+			method: 'GET'
+		};
+		
+		fetch('https://localhost:7296/movies', getRequest)
+			.then(response => response.json())
+			.then(data => {
+				console.log(data);
+				var options = '';
+				data.forEach(function (movie) {
+					options += '<option value="' + movie.id + '">' + movie.title + '</option>'
+				});
+				console.log(options);
+				document.getElementById('idFilmuUsuwanie').innerHTML += options;
+				document.getElementById('idFilmuZmiana').innerHTML += options;
+				document.getElementById('film').innerHTML += options;
+			})
+			.catch(error => {
+				console.error('Błąd:', error);
+			});
+		
+		fetch('https://localhost:7296/screenings', getRequest)
+			.then(response => response.json())
+			.then(data => {
+				console.log(data);
+				var options = '';
+				data.forEach(function (screening) {
+					options += '<option value="' + screening.id + '">' + new Date(screening.time).toLocaleString() + '</option>'
+				});
+				console.log(options);
+				document.getElementById('repertuar').innerHTML += options;
+			})
+			.catch(error => {
+				console.error('Błąd:', error);
+			});
+		
         document.getElementById('addMovie').addEventListener('submit', function (e) {
             e.preventDefault();
-            console.log(sessionStorage.getItem('token'));
+			
 			var dataToSend = {
 				title: document.getElementById('tytul').value,
 				description: document.getElementById('description').value,
@@ -154,6 +227,7 @@
 			fetch('https://localhost:7296/movies', requestOptions)
 				.then(response => response.json())
 				.then(data => {
+					window.location.href = "main-adm.html";
 					console.log(data);
 				})
 				.catch(error => {
@@ -164,7 +238,6 @@
 		document.getElementById('deleteMovie').addEventListener('submit', function (e) {
             e.preventDefault();
 			
-            console.log(sessionStorage.getItem('token'));
 			var requestOptions = {
 				method: 'DELETE',
 				headers: {
@@ -173,7 +246,10 @@
 			}
 			
 			fetch('https://localhost:7296/movies/' + document.getElementById('idFilmuUsuwanie').value, requestOptions)
-				.then(response => console.log(response))
+				.then(response => {
+					window.location.href = "main-adm.html";
+					console.log(response);
+				})
 				.catch(error => {
 					console.error('Błąd:', error);
 				});
@@ -181,8 +257,6 @@
 		
 		document.getElementById('updateMovie').addEventListener('submit', function (e) {
             e.preventDefault();
-			
-            console.log(sessionStorage.getItem('token'));
 			
 			var dataToSend = {
 				id: document.getElementById('idFilmuZmiana').value,
@@ -204,6 +278,59 @@
 			fetch('https://localhost:7296/movies/' + document.getElementById('idFilmuZmiana').value, requestOptions)
 				.then(response => response.json())
 				.then(data => {
+					window.location.href = "main-adm.html";
+					console.log(data);
+				})
+				.catch(error => {
+					console.error('Błąd:', error);
+				});
+        });
+		
+		document.getElementById('addScreening').addEventListener('submit', function (e) {
+            e.preventDefault();
+			
+			var combinedDate = document.getElementById('data').value + 'T' + document.getElementById('time').value;
+			var utc = new Date(combinedDate).toUTCString()
+			
+			var dataToSend = {
+				movieId: document.getElementById('film').value,
+				time: new Date(utc).toISOString()
+			};
+			
+            var requestOptions = {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+				},
+				body: JSON.stringify(dataToSend)
+			}
+			
+			fetch('https://localhost:7296/screenings', requestOptions)
+				.then(response => response.json())
+				.then(data => {
+					window.location.href = "main-adm.html";
+					console.log(data);
+				})
+				.catch(error => {
+					console.error('Błąd:', error);
+				});
+        });
+		
+		document.getElementById('deleteScreening').addEventListener('submit', function (e) {
+            e.preventDefault();
+			
+            var requestOptions = {
+				method: 'DELETE',
+				headers: {
+					'Authorization': 'Bearer ' + sessionStorage.getItem('token')
+				}
+			}
+			
+			fetch('https://localhost:7296/screenings/' + document.getElementById('repertuar').value, requestOptions)
+				.then(response => response.json())
+				.then(data => {
+					window.location.href = "main-adm.html";
 					console.log(data);
 				})
 				.catch(error => {

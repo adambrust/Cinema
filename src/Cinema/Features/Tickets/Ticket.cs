@@ -1,5 +1,6 @@
 ﻿using Cinema.Features.Common;
 using Cinema.Features.Screenings;
+using Cinema.Features.Sits;
 using Cinema.Features.Users;
 
 namespace Cinema.Features.Tickets;

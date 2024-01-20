@@ -21,6 +21,14 @@ public sealed class DeleteMoviesRequestHandler(CinemaDbContext db)
             return Results.NotFound();
         }
 
+        var screenings = db.Screenings.Where(s => s.Movie.Id == movie.Id);
+
+        var tickets = db.Tickets.Where(t => screenings.Select(s => s.Id).Contains(t.Screening.Id));
+
+        db.Tickets.RemoveRange(tickets);
+
+        db.Screenings.RemoveRange(screenings);
+
         db.Movies.Remove(movie);
 
         await db.SaveChangesAsync(cancellationToken);

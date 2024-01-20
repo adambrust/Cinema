@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cinema.Features.Screenings;
 
-public sealed record CreateScreeningRequest(Guid MovieId, Guid HallId, DateTime Time) : IRequest<IResult>;
+public sealed record CreateScreeningRequest(Guid MovieId, DateTime Time) : IRequest<IResult>;
 
 public sealed class CreateScreeningRequestValidator : AbstractValidator<CreateScreeningRequest>
 {
@@ -18,9 +18,6 @@ public sealed class CreateScreeningRequestValidator : AbstractValidator<CreateSc
     {
         RuleFor(c => c.MovieId).NotEmpty();
         RuleFor(c => c.MovieId).IdExist<CreateScreeningRequest, Movie>(serviceProvider);
-
-        RuleFor(c => c.HallId).NotEmpty();
-        RuleFor(c => c.HallId).IdExist<CreateScreeningRequest, Hall>(serviceProvider);
 
         RuleFor(c => c.Time).NotEmpty();
         RuleFor(c => c.Time).GreaterThan(dateTime.UtcNow);
@@ -41,17 +38,12 @@ public sealed class CreateScreeningRequestHandler(
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        var movie = await db.Movies.AsNoTracking()
-            .SingleAsync(m => m.Id == request.MovieId, cancellationToken);
-
-        var hall = await db.Halls.AsNoTracking()
-            .SingleAsync(h => h.Id == request.HallId, cancellationToken);
+        var movie = await db.Movies.SingleAsync(m => m.Id == request.MovieId, cancellationToken);
 
         var screening = new Screening
         {
             Id = Guid.NewGuid(),
             Movie = movie,
-            Hall = hall,
             Time = request.Time,
             ReservedSits = []
         };

@@ -11,11 +11,11 @@ public static class ValidatorExtensions
         IServiceProvider serviceProvider)
         where TEntity : class, IEntity
     {
-        return ruleBuilder.MustAsync((id, cancellationToken) =>
+        return ruleBuilder.MustAsync(async (id, cancellationToken) =>
         {
             using var scope = serviceProvider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
-            return db.Set<TEntity>().AsNoTracking().AnyAsync(e => e.Id == id, cancellationToken);
+            return await db.Set<TEntity>().AsNoTracking().AnyAsync(e => e.Id == id, cancellationToken);
         }).WithMessage($"{nameof(TEntity)} does not exits");
     }
 }

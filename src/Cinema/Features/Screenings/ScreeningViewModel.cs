@@ -1,20 +1,12 @@
-﻿using Cinema.Features.Movies;
+﻿using Cinema.Features.Sits;
 
 namespace Cinema.Features.Screenings;
 
 public sealed record ScreeningViewModel(
     Guid Id,
-    MovieViewModel Movie,
-    HallViewModel Hall,
-    List<Sit> Sits,
+    Guid MovieId,
     DateTime Time,
     List<Sit> ReservedSits);
-
-public sealed record ScreeningListViewModel(
-    Guid Id,
-    MovieViewModel Movie,
-    HallViewModel Hall,
-    DateTime Time);
 
 public static class ScreeningViewModelExtensions
 {
@@ -22,23 +14,17 @@ public static class ScreeningViewModelExtensions
     {
         return new(
             screening.Id,
-            screening.Movie.ToViewModel(),
-            screening.Hall.ToViewModel(),
-            screening.Hall.Sits,
+            screening.Movie.Id,
             screening.Time,
             screening.ReservedSits);
     }
 
-    public static IEnumerable<ScreeningListViewModel> ToViewModel(this IEnumerable<Screening> screenings)
+    public static IEnumerable<ScreeningViewModel> ToViewModel(this IEnumerable<Screening> screenings)
     {
-        var models = new List<ScreeningListViewModel>();
+        var models = new List<ScreeningViewModel>();
         foreach (var screening in screenings)
         {
-            models.Add(new(
-                screening.Id,
-                screening.Movie.ToViewModel(),
-                screening.Hall.ToViewModel(),
-                screening.Time));
+            models.Add(screening.ToViewModel());
         }
         return models;
     }

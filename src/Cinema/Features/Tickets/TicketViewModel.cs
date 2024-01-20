@@ -1,19 +1,18 @@
-﻿using Cinema.Features.Screenings;
-using Cinema.Features.Users;
+﻿using Cinema.Features.Sits;
 
 namespace Cinema.Features.Tickets;
 
 public sealed record TicketViewModel(
     Guid Id,
-    UserViewModel User,
-    ScreeningViewModel Screening,
+    Guid UserId,
+    Guid ScreeningId,
     List<Sit> Sits);
 
 public static class TicketViewModelExtensions
 {
     public static TicketViewModel ToViewModel(this Ticket ticket)
     {
-        return new(ticket.Id, ticket.User.ToViewModel(), ticket.Screening.ToViewModel(), ticket.Sits);
+        return new(ticket.Id, ticket.User.Id, ticket.Screening.Id, ticket.Sits);
     }
 
     public static IEnumerable<TicketViewModel> ToViewModel(this IEnumerable<Ticket> tickets)

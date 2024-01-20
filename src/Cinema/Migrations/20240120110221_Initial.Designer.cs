@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Cinema.Migrations
 {
     [DbContext(typeof(CinemaDbContext))]
-    [Migration("20240119093546_Initial")]
+    [Migration("20240120110221_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -51,27 +51,10 @@ namespace Cinema.Migrations
                     b.ToTable("Movies");
                 });
 
-            modelBuilder.Entity("Cinema.Features.Screenings.Hall", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Number")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Halls");
-                });
-
             modelBuilder.Entity("Cinema.Features.Screenings.Screening", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("HallId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("MovieId")
@@ -82,39 +65,26 @@ namespace Cinema.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HallId");
-
                     b.HasIndex("MovieId");
 
                     b.ToTable("Screenings");
                 });
 
-            modelBuilder.Entity("Cinema.Features.Screenings.Sit", b =>
+            modelBuilder.Entity("Cinema.Features.Sits.Sit", b =>
                 {
-                    b.Property<int>("Row")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Column")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("HallId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("Row")
+                        .HasColumnType("integer");
 
-                    b.Property<Guid?>("ScreeningId")
-                        .HasColumnType("uuid");
+                    b.HasKey("Id");
 
-                    b.Property<Guid?>("TicketId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Row", "Column");
-
-                    b.HasIndex("HallId");
-
-                    b.HasIndex("ScreeningId");
-
-                    b.HasIndex("TicketId");
-
-                    b.ToTable("Sit");
+                    b.ToTable("Sits");
                 });
 
             modelBuilder.Entity("Cinema.Features.Tickets.Ticket", b =>
@@ -333,38 +303,45 @@ namespace Cinema.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ScreeningSit", b =>
+                {
+                    b.Property<Guid>("ReservedSitsId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ScreeningId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ReservedSitsId", "ScreeningId");
+
+                    b.HasIndex("ScreeningId");
+
+                    b.ToTable("ScreeningSit");
+                });
+
+            modelBuilder.Entity("SitTicket", b =>
+                {
+                    b.Property<Guid>("SitsId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TicketId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("SitsId", "TicketId");
+
+                    b.HasIndex("TicketId");
+
+                    b.ToTable("SitTicket");
+                });
+
             modelBuilder.Entity("Cinema.Features.Screenings.Screening", b =>
                 {
-                    b.HasOne("Cinema.Features.Screenings.Hall", "Hall")
-                        .WithMany()
-                        .HasForeignKey("HallId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Cinema.Features.Movies.Movie", "Movie")
                         .WithMany()
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Hall");
-
                     b.Navigation("Movie");
-                });
-
-            modelBuilder.Entity("Cinema.Features.Screenings.Sit", b =>
-                {
-                    b.HasOne("Cinema.Features.Screenings.Hall", null)
-                        .WithMany("Sits")
-                        .HasForeignKey("HallId");
-
-                    b.HasOne("Cinema.Features.Screenings.Screening", null)
-                        .WithMany("ReservedSits")
-                        .HasForeignKey("ScreeningId");
-
-                    b.HasOne("Cinema.Features.Tickets.Ticket", null)
-                        .WithMany("Sits")
-                        .HasForeignKey("TicketId");
                 });
 
             modelBuilder.Entity("Cinema.Features.Tickets.Ticket", b =>
@@ -437,19 +414,34 @@ namespace Cinema.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Cinema.Features.Screenings.Hall", b =>
+            modelBuilder.Entity("ScreeningSit", b =>
                 {
-                    b.Navigation("Sits");
+                    b.HasOne("Cinema.Features.Sits.Sit", null)
+                        .WithMany()
+                        .HasForeignKey("ReservedSitsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Cinema.Features.Screenings.Screening", null)
+                        .WithMany()
+                        .HasForeignKey("ScreeningId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("Cinema.Features.Screenings.Screening", b =>
+            modelBuilder.Entity("SitTicket", b =>
                 {
-                    b.Navigation("ReservedSits");
-                });
+                    b.HasOne("Cinema.Features.Sits.Sit", null)
+                        .WithMany()
+                        .HasForeignKey("SitsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("Cinema.Features.Tickets.Ticket", b =>
-                {
-                    b.Navigation("Sits");
+                    b.HasOne("Cinema.Features.Tickets.Ticket", null)
+                        .WithMany()
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

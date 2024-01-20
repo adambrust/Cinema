@@ -1,4 +1,4 @@
-﻿using Cinema.Features.Screenings;
+﻿using Cinema.Features.Sits;
 using Cinema.Features.Users;
 using Microsoft.AspNetCore.Identity;
 
@@ -38,7 +38,7 @@ public static class SeedDataExtension
 
         var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
 
-        if (db.Halls.Any())
+        if (db.Sits.Any())
         {
             return;
         }
@@ -48,22 +48,11 @@ public static class SeedDataExtension
         {
             for (int j = 1; j <= 15; j++)
             {
-                sits.Add(new(i, j));
+                sits.Add(new() { Row = i, Column = j });
             }
         }
 
-        var halls = new List<Hall>();
-        for (var i = 1; i <= 10; i++)
-        {
-            halls.Add(new()
-            {
-                Id = Guid.NewGuid(),
-                Number = i,
-                Sits = sits
-            });
-        }
-
-        await db.Halls.AddRangeAsync(halls);
+        await db.Sits.AddRangeAsync(sits);
 
         await db.SaveChangesAsync();
     }

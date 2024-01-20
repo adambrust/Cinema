@@ -13,7 +13,10 @@ public sealed class GetScreeningByIdRequestHandler(CinemaDbContext db)
 {
     public async Task<IResult> Handle(GetScreeningByIdRequest request, CancellationToken cancellationToken)
     {
-        var screening = await db.Screenings.AsNoTracking()
+        var screening = await db.Screenings
+            .AsNoTracking()
+            .Include(s => s.Movie)
+            .Include(s => s.ReservedSits)
             .SingleOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
 
         if (screening is null)

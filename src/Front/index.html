@@ -42,6 +42,9 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
+		sessionStorage.setItem('token', '');
+		sessionStorage.setItem('email', '');
+		
         document.getElementById('loginForm').addEventListener('submit', function (e) {
             e.preventDefault();
             
@@ -63,6 +66,7 @@
 				.then(data => {
 					console.log(data);
 					sessionStorage.setItem('token', data.accessToken);
+					sessionStorage.setItem('email', dataToSend.email);
 					window.location.href = 'main-adm.html';
 				})
 				.catch(error => {

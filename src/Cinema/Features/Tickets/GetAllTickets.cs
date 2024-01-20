@@ -14,7 +14,12 @@ public sealed class GetAllTicketsRequestHandler(CinemaDbContext db)
 {
     public async Task<IResult> Handle(GetAllTicketsRequest request, CancellationToken cancellationToken)
     {
-        var tickets = await db.Tickets.AsNoTracking().ToListAsync(cancellationToken);
+        var tickets = await db.Tickets
+            .AsNoTracking()
+            .Include(t => t.User)
+            .Include(t => t.Screening)
+            .Include(t => t.Sits)
+            .ToListAsync(cancellationToken);
 
         return Results.Ok(tickets.ToViewModel());
     }

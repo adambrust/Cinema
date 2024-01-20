@@ -1,5 +1,6 @@
 ﻿using Carter;
 using Cinema.Features.Common;
+using Cinema.Features.Sits;
 using Cinema.Features.Tickets;
 using Cinema.Features.Users;
 using Cinema.Persistance;
@@ -10,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cinema.Features.Screenings;
 
-public sealed record CreateTicketRequest(Guid UserId, Guid ScreeningId, List<Sit> Sits) : IRequest<IResult>;
+public sealed record CreateTicketRequest(Guid UserId, Guid ScreeningId, List<Guid> Sits) : IRequest<IResult>;
 
 public sealed class CreateTicketRequestValidator : AbstractValidator<CreateTicketRequest>
 {
@@ -26,19 +27,16 @@ public sealed class CreateTicketRequestValidator : AbstractValidator<CreateTicke
         RuleFor(c => c.ScreeningId).IdExist<CreateTicketRequest, Screening>(serviceProvider);
 
         RuleFor(c => c.Sits).NotEmpty();
-        RuleForEach(c => c.Sits).MustAsync((command, sit, cancellationToken) =>
+        RuleForEach(c => c.Sits).IdExist<CreateTicketRequest, Sit>(serviceProvider);
+        RuleForEach(c => c.Sits).MustAsync(async (command, sitId, cancellationToken) =>
         {
-            return db.Screenings.AsNoTracking()
-                .Where(s => s.Id == command.ScreeningId)
-                .SelectMany(s => s.Hall.Sits)
-                .ContainsAsync(sit, cancellationToken);
-        }).WithMessage("Sit does not exist in this hall");
-        RuleForEach(c => c.Sits).MustAsync(async (command, sit, cancellationToken) =>
-        {
+            using var scope = serviceProvider.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<CinemaDbContext>();
             return !await db.Screenings.AsNoTracking()
                 .Where(s => s.Id == command.ScreeningId)
                 .SelectMany(s => s.ReservedSits)
-                .ContainsAsync(sit, cancellationToken);
+                .Select(s => s.Id)
+                .ContainsAsync(sitId, cancellationToken);
         }).WithMessage("Sit is arledy reserved");
     }
 }
@@ -55,13 +53,15 @@ public sealed class CreateTicketRequestHandler(CinemaDbContext db, IValidator<Cr
             return Results.ValidationProblem(validationResult.ToDictionary());
         }
 
-        var user = await db.Users.AsNoTracking()
-            .SingleAsync(u => u.Id == request.UserId, cancellationToken);
+        var user = await db.Users.SingleAsync(u => u.Id == request.UserId, cancellationToken);
 
-        var screening = await db.Screenings.AsNoTracking()
-            .SingleAsync(s => s.Id == request.ScreeningId, cancellationToken);
+        var screening = await db.Screenings.SingleAsync(s => s.Id == request.ScreeningId, cancellationToken);
 
-        foreach (var sit in request.Sits)
+        var sits = await db.Sits
+            .Where(s => request.Sits.Contains(s.Id))
+            .ToListAsync(cancellationToken);
+
+        foreach (var sit in sits)
         {
             screening.ReservedSits.Add(sit);
         }
@@ -71,7 +71,7 @@ public sealed class CreateTicketRequestHandler(CinemaDbContext db, IValidator<Cr
             Id = Guid.NewGuid(),
             User = user,
             Screening = screening,
-            Sits = request.Sits
+            Sits = sits
         };
 
         await db.Tickets.AddAsync(ticket, cancellationToken);
