@@ -1,4 +1,5 @@
 ﻿using Carter;
+using Cinema.Features.Common;
 using Cinema.Features.Users;
 using Cinema.Persistance;
 using FluentValidation;
@@ -10,17 +11,18 @@ namespace Cinema.Features.Movies;
 public sealed record CreateMovieRequest(
     string Title,
     string Description,
-    int Duration,
+    DateTime Time,
     string Image)
     : IRequest<IResult>;
 
 public sealed class CreateMovieRequestValidator : AbstractValidator<CreateMovieRequest>
 {
-    public CreateMovieRequestValidator()
+    public CreateMovieRequestValidator(IDateTimeProvider dateTime)
     {
         RuleFor(c => c.Title).NotEmpty();
         RuleFor(c => c.Description).NotEmpty();
-        RuleFor(c => c.Duration).NotEmpty();
+        RuleFor(c => c.Time).NotEmpty();
+        RuleFor(c => c.Time).GreaterThan(dateTime.UtcNow);
         RuleFor(c => c.Image).NotEmpty();
     }
 }
@@ -42,7 +44,7 @@ public sealed class CreateMovieRequestHandler(CinemaDbContext db, IValidator<Cre
             Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
-            Duration = TimeSpan.FromMinutes(request.Duration),
+            Time = request.Time,
             Image = request.Image,
         };
 

@@ -4,7 +4,15 @@ public sealed record MovieViewModel(
     Guid Id,
     string Title,
     string Description,
-    int Duration,
+    DateTime Time,
+    string Image,
+    IEnumerable<Guid> ReservedSits);
+
+public sealed record MovieListViewModel(
+    Guid Id,
+    string Title,
+    string Description,
+    DateTime Time,
     string Image);
 
 public static class MovieViewModelExtensions
@@ -15,16 +23,23 @@ public static class MovieViewModelExtensions
             movie.Id,
             movie.Title,
             movie.Description,
-            movie.Duration.Minutes,
-            movie.Image);
+            movie.Time,
+            movie.Image,
+            movie.ReservedSits.Select(s => s.Id));
     }
 
-    public static IEnumerable<MovieViewModel> ToViewModel(this IEnumerable<Movie> movies)
+    public static IEnumerable<MovieListViewModel> ToViewModel(this IEnumerable<Movie> movies)
     {
-        var models = new List<MovieViewModel>();
+        var models = new List<MovieListViewModel>();
         foreach (var movie in movies)
         {
-            models.Add(movie.ToViewModel());
+            models.Add(new(
+                movie.Id,
+                movie.Title,
+                movie.Description,
+                movie.Time,
+                movie.Image
+            ));
         }
         return models;
     }

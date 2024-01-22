@@ -1,85 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moje Rezerwacje - Serwis Kinowy</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moje Rezerwacje - Serwis Kinowy</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="stylesheet.css">
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-user"></i> Moje Rezerwacje
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-sign-out-alt"></i> Wyloguj się
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-sign-out-alt"></i> Strona główna
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <div class="container mt-5">
-        <h2 class="mb-4">Moje Rezerwacje - Serwis Kinowy</h2>
-
-        <!-- Tabela z rezerwacjami -->
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID Rezerwacji</th>
-                    <th>Tytuł Filmu</th>
-                    <th>Data</th>
-                    <th>Akcje</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Przykładowe dane - do zastąpienia rzeczywistymi danymi z bazy danych -->
-                <tr>
-                    <td>1</td>
-                    <td>Przykładowy Film 1</td>
-                    <td>2024-01-18 16:69</td>
-                    <td>
-
-                        <button type="button" class="btn btn-danger btn-sm" onclick="usunRezerwacje(1)">Usuń</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Przykładowy Film 2</td>
-                    <td>2024-01-19 18:00</td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="usunRezerwacje(2)">Usuń</button>
-                    </td>
-                </tr>
-
-            </tbody>
-        </table>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto" id="nav"></ul>
     </div>
+  </nav>
 
+  <div class="container mt-5">
+    <h2 class="mb-4">Moje Rezerwacje - Serwis Kinowy</h2>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Tabela z rezerwacjami -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tytuł Filmu</th>
+          <th>Data</th>
+          <th>Miejsca</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody id="tickets"></tbody>
+    </table>
+  </div>
 
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <script>
-        function usunRezerwacje(idRezerwacji) {
+  <script>
+    const email = sessionStorage.getItem('email');
+    const token = sessionStorage.getItem('token');
+
+    if (email === 'admin@cinema.pl') {
+      document.getElementById('nav').innerHTML += '<li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-user"></i>Strona główna</a></li>';
+      document.getElementById('nav').innerHTML += '<li class="nav-item"><a class="nav-link" href="reservations.html"><i class="fas fa-user"></i>Moje Rezerwacje</a></li>';
+      document.getElementById('nav').innerHTML += '<li class="nav-item"><a class="nav-link" href="adm-panel.html"><i class="fas fa-sign-out-alt"></i>Ustawienia</a></li>';
+      document.getElementById('nav').innerHTML += '<li class="nav-item"><a class="nav-link" href="login.html"><i class="fas fa-user"></i>Wyloguj się</a></li>';
+    } else if (token !== '' && token !== null) {
+      document.getElementById('nav').innerHTML += '<li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-user"></i>Strona główna</a></li>';
+      document.getElementById('nav').innerHTML += '<li class="nav-item"><a class="nav-link" href="reservations.html"><i class="fas fa-user"></i>Moje Rezerwacje</a></li>';
+      document.getElementById('nav').innerHTML += '<li class="nav-item"><a class="nav-link" href="login.html"><i class="fas fa-user"></i>Wyloguj się</a></li>';
+    } else {
+      document.getElementById('nav').innerHTML += '<li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-user"></i>Strona główna</a></li>';
+      document.getElementById('nav').innerHTML += '<li class="nav-item"><a class="nav-link" href="login.html"><i class="fas fa-user"></i>Zaloguj się</a></li>';
+    }
+
+    var requestOptions = {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      },
+    };
+
+    fetch('https://localhost:7296/tickets', requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(function (ticket) {
+          fetch('https://localhost:7296/movies/' + ticket.movieId, requestOptions)
+            .then(response => response.json())
+            .then(movie => {
+              document.getElementById('tickets').innerHTML += '<tr><td>' + movie.title + '</td><td>' + new Date(movie.time).toLocaleString() + '</td><td>' + ticket.sits.map(sit => sit.row + '/' + sit.column).join(', ') + '</td><td><button type="button" class="btn btn-danger btn-sm" onclick="usunRezerwacje(\'' + ticket.id + '\')">Usuń</button></td></tr>';
+            })
+            .catch(error => {
+              console.error('Błąd:', error);
+            });
+        })
+      })
+      .catch(error => {
+        console.error('Błąd:', error);
+      });
+
+    function usunRezerwacje(idRezerwacji) {
+      var requestDelete = {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
+      };
+
+      fetch('https://localhost:7296/tickets/' + idRezerwacji, requestDelete)
+        .then(response => {
+          console.log(response);
+          if (response.ok) {
             alert("Rezerwacja o ID " + idRezerwacji + " została usunięta.");
-        }
-    </script>
+            window.location.href = "reservations.html";
+          }
+        })
+        .catch(error => {
+          console.error('Błąd:', error);
+        });
+    }
+  </script>
+</body>
 
-</body></html>
+</html>

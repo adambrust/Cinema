@@ -13,16 +13,21 @@ public sealed class DeleteTicketRequestHandler(CinemaDbContext db)
 {
     public async Task<IResult> Handle(DeleteTicketRequest request, CancellationToken cancellationToken)
     {
-        var ticket = await db.Tickets.SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
+        var ticket = await db.Tickets
+            .Include(t => t.Movie)
+            .Include(t => t.Sits)
+            .SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
 
         if (ticket is null)
         {
             return Results.NotFound();
         }
 
-        var screening = await db.Screenings.SingleAsync(s => s.Id == ticket.Screening.Id, cancellationToken);
+        var movie = await db.Movies
+            .Include(m => m.ReservedSits)
+            .SingleAsync(m => m.Id == ticket.Movie.Id, cancellationToken);
 
-        screening.ReservedSits.RemoveAll(ticket.Sits.Contains);
+        movie.ReservedSits.RemoveAll(ticket.Sits.Contains);
 
         db.Tickets.Remove(ticket);
 
@@ -36,11 +41,12 @@ public sealed class DeleteTicket : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("ticets/{id:guid}", async (
+        app.MapDelete("tickets/{id:guid}", async (
             Guid id,
             [FromServices] ISender sender,
             CancellationToken cancellationToken) =>
                 await sender.Send(new DeleteTicketRequest(id), cancellationToken))
+            .WithOpenApi()
             .RequireAuthorization()
             .Produces(204)
             .Produces(404);

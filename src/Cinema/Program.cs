@@ -38,7 +38,7 @@ builder.Services.AddSwaggerGen(option =>
                     Id="Bearer"
                 }
             },
-            new string[]{}
+            Array.Empty<string>()
         }
     });
 });
@@ -59,6 +59,7 @@ builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirme
 builder.Services.AddAuthentication()
     .AddBearerToken(IdentityConstants.BearerScheme);
 builder.Services.AddAuthorizationBuilder()
+    .AddDefaultPolicy("Default", policy => policy.RequireAuthenticatedUser())
     .AddPolicy(ApplicationRoles.Admin, policy => policy.RequireRole(ApplicationRoles.Admin))
     .AddPolicy(ApplicationRoles.Worker, policy =>
         policy.RequireRole(ApplicationRoles.Admin, ApplicationRoles.Worker));

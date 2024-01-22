@@ -28,6 +28,6 @@ public sealed class GetAllMovies : ICarterModule
             CancellationToken cancellationToken) =>
                 await sender.Send(new GetAllMoviesRequest(), cancellationToken))
             .WithOpenApi()
-            .Produces<IEnumerable<MovieViewModel>>();
+            .Produces<IEnumerable<MovieListViewModel>>();
     }
 }

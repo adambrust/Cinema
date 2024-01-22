@@ -5,14 +5,14 @@ namespace Cinema.Features.Tickets;
 public sealed record TicketViewModel(
     Guid Id,
     Guid UserId,
-    Guid ScreeningId,
+    Guid MovieId,
     List<Sit> Sits);
 
 public static class TicketViewModelExtensions
 {
     public static TicketViewModel ToViewModel(this Ticket ticket)
     {
-        return new(ticket.Id, ticket.User.Id, ticket.Screening.Id, ticket.Sits);
+        return new(ticket.Id, ticket.User.Id, ticket.Movie.Id, ticket.Sits);
     }
 
     public static IEnumerable<TicketViewModel> ToViewModel(this IEnumerable<Ticket> tickets)

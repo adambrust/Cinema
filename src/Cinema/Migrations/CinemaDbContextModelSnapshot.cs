@@ -32,12 +32,12 @@ namespace Cinema.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<TimeSpan>("Duration")
-                        .HasColumnType("interval");
-
                     b.Property<string>("Image")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -46,25 +46,6 @@ namespace Cinema.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Movies");
-                });
-
-            modelBuilder.Entity("Cinema.Features.Screenings.Screening", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("MovieId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MovieId");
-
-                    b.ToTable("Screenings");
                 });
 
             modelBuilder.Entity("Cinema.Features.Sits.Sit", b =>
@@ -90,7 +71,7 @@ namespace Cinema.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ScreeningId")
+                    b.Property<Guid>("MovieId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("UserId")
@@ -98,7 +79,7 @@ namespace Cinema.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ScreeningId");
+                    b.HasIndex("MovieId");
 
                     b.HasIndex("UserId");
 
@@ -300,19 +281,19 @@ namespace Cinema.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ScreeningSit", b =>
+            modelBuilder.Entity("MovieSit", b =>
                 {
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("ReservedSitsId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ScreeningId")
-                        .HasColumnType("uuid");
+                    b.HasKey("MovieId", "ReservedSitsId");
 
-                    b.HasKey("ReservedSitsId", "ScreeningId");
+                    b.HasIndex("ReservedSitsId");
 
-                    b.HasIndex("ScreeningId");
-
-                    b.ToTable("ScreeningSit");
+                    b.ToTable("MovieSit");
                 });
 
             modelBuilder.Entity("SitTicket", b =>
@@ -330,22 +311,11 @@ namespace Cinema.Migrations
                     b.ToTable("SitTicket");
                 });
 
-            modelBuilder.Entity("Cinema.Features.Screenings.Screening", b =>
+            modelBuilder.Entity("Cinema.Features.Tickets.Ticket", b =>
                 {
                     b.HasOne("Cinema.Features.Movies.Movie", "Movie")
                         .WithMany()
                         .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Movie");
-                });
-
-            modelBuilder.Entity("Cinema.Features.Tickets.Ticket", b =>
-                {
-                    b.HasOne("Cinema.Features.Screenings.Screening", "Screening")
-                        .WithMany()
-                        .HasForeignKey("ScreeningId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -355,7 +325,7 @@ namespace Cinema.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Screening");
+                    b.Navigation("Movie");
 
                     b.Navigation("User");
                 });
@@ -411,17 +381,17 @@ namespace Cinema.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ScreeningSit", b =>
+            modelBuilder.Entity("MovieSit", b =>
                 {
-                    b.HasOne("Cinema.Features.Sits.Sit", null)
+                    b.HasOne("Cinema.Features.Movies.Movie", null)
                         .WithMany()
-                        .HasForeignKey("ReservedSitsId")
+                        .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Cinema.Features.Screenings.Screening", null)
+                    b.HasOne("Cinema.Features.Sits.Sit", null)
                         .WithMany()
-                        .HasForeignKey("ScreeningId")
+                        .HasForeignKey("ReservedSitsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

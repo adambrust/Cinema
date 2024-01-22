@@ -2,6 +2,7 @@
 using Cinema.Features.Users;
 using Cinema.Persistance;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,19 +10,32 @@ namespace Cinema.Features.Tickets;
 
 public sealed record GetAllTicketsRequest : IRequest<IResult>;
 
-public sealed class GetAllTicketsRequestHandler(CinemaDbContext db)
+public sealed class GetAllTicketsRequestHandler(
+    CinemaDbContext db,
+    UserManager<User> userManager,
+    IHttpContextAccessor contextAccessor)
     : IRequestHandler<GetAllTicketsRequest, IResult>
 {
     public async Task<IResult> Handle(GetAllTicketsRequest request, CancellationToken cancellationToken)
     {
-        var tickets = await db.Tickets
-            .AsNoTracking()
+        var user = await userManager.GetUserAsync(contextAccessor.HttpContext!.User);
+
+        var isWorker = await userManager.IsInRoleAsync(user!, ApplicationRoles.Admin);
+
+        var tickets = db.Tickets.AsNoTracking();
+
+        if (!isWorker)
+        {
+            tickets = tickets.Where(t => t.User.Id == user!.Id);
+        }
+
+        var results = await tickets
             .Include(t => t.User)
-            .Include(t => t.Screening)
+            .Include(t => t.Movie)
             .Include(t => t.Sits)
             .ToListAsync(cancellationToken);
 
-        return Results.Ok(tickets.ToViewModel());
+        return Results.Ok(results.ToViewModel());
     }
 }
 
@@ -34,7 +48,7 @@ public sealed class GetAllTickets : ICarterModule
             CancellationToken cancellationToken) =>
                 await sender.Send(new GetAllTicketsRequest(), cancellationToken))
             .WithOpenApi()
-            .RequireAuthorization(ApplicationRoles.Worker)
+            .RequireAuthorization()
             .Produces<IEnumerable<TicketViewModel>>(200);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Carter;
+using Cinema.Features.Common;
 using Cinema.Features.Users;
 using Cinema.Persistance;
 using FluentValidation;
@@ -12,17 +13,18 @@ public sealed record UpdateMovieRequest(
     [FromRoute] Guid Id,
     string Title,
     string Description,
-    int Duration,
+    DateTime Time,
     string Image)
     : IRequest<IResult>;
 
 public sealed class UpdateMovieRequestValidator : AbstractValidator<UpdateMovieRequest>
 {
-    public UpdateMovieRequestValidator()
+    public UpdateMovieRequestValidator(IDateTimeProvider dateTime)
     {
         RuleFor(c => c.Title).NotEmpty();
         RuleFor(c => c.Description).NotEmpty();
-        RuleFor(c => c.Duration).NotEmpty();
+        RuleFor(c => c.Time).NotEmpty();
+        RuleFor(c => c.Time).GreaterThan(dateTime.UtcNow);
         RuleFor(c => c.Image).NotEmpty();
     }
 }
@@ -50,7 +52,7 @@ public sealed class UpdateMovieRequestHandler(
 
         movie.Title = request.Title;
         movie.Description = request.Description;
-        movie.Duration = TimeSpan.FromMinutes(request.Duration);
+        movie.Time = request.Time;
         movie.Image = request.Image;
 
         db.Movies.Update(movie);

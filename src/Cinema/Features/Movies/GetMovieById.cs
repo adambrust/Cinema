@@ -13,7 +13,9 @@ public sealed class GetMovieByIdRequestHandler(CinemaDbContext db)
 {
     public async Task<IResult> Handle(GetMovieByIdRequest request, CancellationToken cancellationToken)
     {
-        var movie = await db.Movies.AsNoTracking()
+        var movie = await db.Movies
+            .AsNoTracking()
+            .Include(m => m.ReservedSits)
             .SingleOrDefaultAsync(m => m.Id == request.Id, cancellationToken);
 
         if (movie is null)
