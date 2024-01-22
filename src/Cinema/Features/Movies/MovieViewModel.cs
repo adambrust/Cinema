@@ -5,15 +5,13 @@ public sealed record MovieViewModel(
     string Title,
     string Description,
     DateTime Time,
-    string Image,
     IEnumerable<Guid> ReservedSits);
 
 public sealed record MovieListViewModel(
     Guid Id,
     string Title,
     string Description,
-    DateTime Time,
-    string Image);
+    DateTime Time);
 
 public static class MovieViewModelExtensions
 {
@@ -24,7 +22,6 @@ public static class MovieViewModelExtensions
             movie.Title,
             movie.Description,
             movie.Time,
-            movie.Image,
             movie.ReservedSits.Select(s => s.Id));
     }
 
@@ -37,8 +34,7 @@ public static class MovieViewModelExtensions
                 movie.Id,
                 movie.Title,
                 movie.Description,
-                movie.Time,
-                movie.Image
+                movie.Time
             ));
         }
         return models;

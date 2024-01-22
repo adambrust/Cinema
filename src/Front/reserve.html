@@ -55,29 +55,7 @@
     } else {
       document.getElementById('nav').innerHTML += '<li class="nav-item"><a class="nav-link" href="index.html"><i class="fas fa-user"></i>Strona główna</a></li>';
       document.getElementById('nav').innerHTML += '<li class="nav-item"><a class="nav-link" href="login.html"><i class="fas fa-user"></i>Zaloguj się</a></li>';
-    }
-
-    var sits = [];
-    
-    var getSits = {
-      method: 'GET'
-    };
-
-    fetch('https://localhost:7296/sits', getSits)
-      .then(response => response.json())
-      .then(data => {
-        sits = data;
-        sits.sort((a, b) => {
-          if (a.row !== b.row) {
-            return a.row - b.row;
-          }
-
-          return a.column - b.column;
-        });
-      })
-      .catch(error => {
-        console.log('Błąd: ', error);
-      });
+    }s
 
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
@@ -89,22 +67,37 @@
     fetch('https://localhost:7296/movies/' + id, requestOptions)
       .then(response => response.json())
       .then(data => {
-        console.log(data);
         document.getElementById("title").innerHTML += data.title;
         document.getElementById("date").innerHTML += new Date(data.time).toLocaleString();
         const seatsContainer = document.getElementById('seatContainer');
-        sits.forEach(function (sit) {
-          const seat = document.createElement('div');
-          seat.textContent = sit.column;
-          seat.className = 'seat';
-          if (data.reservedSits.find(s => s === sit.id)) {
-            seat.classList.toggle('reserved');
-          } else if (token !== '' && token !== null) {
-            seat.id = sit.id;
-            seat.addEventListener('click', toggleSeat);
-          }
-          seatsContainer.appendChild(seat);
-        })
+
+        fetch('https://localhost:7296/sits', requestOptions)
+          .then(response => response.json())
+          .then(sits => {
+            sits.sort((a, b) => {
+              if (a.row !== b.row) {
+                return a.row - b.row;
+              }
+
+              return a.column - b.column;
+            });
+
+            sits.forEach(function (sit) {
+              const seat = document.createElement('div');
+              seat.textContent = sit.column;
+              seat.className = 'seat';
+              if (data.reservedSits.find(s => s === sit.id)) {
+                seat.classList.toggle('reserved');
+              } else if (token !== '' && token !== null) {
+                seat.id = sit.id;
+                seat.addEventListener('click', toggleSeat);
+              }
+              seatsContainer.appendChild(seat);
+            });
+          })
+          .catch(error => {
+            console.log('Błąd: ', error);
+          });
       })
       .catch(error => {
         console.error('Błąd:', error);

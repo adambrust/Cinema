@@ -51,7 +51,7 @@
       .then(response => response.json())
       .then(data => {
         data.forEach(function(currentValue) {
-          document.getElementById('root').innerHTML += '<div class="container movie-container"><div class="row"><div class="col-md-9"><div class="card movie-card bg-transparent border-0"><div class="card-body col-md-8"><h5 class="card-title">' + currentValue.title + '</h5><p class="card-text">' + currentValue.description + '</p><a href="reserve.html?id=' + currentValue.id + '" class="btn btn-primary">Kup bilet</a></div></div></div><div class="card-img col-md-3"><img class="img-card" src="' + currentValue.image + '"></div></div></div>';
+          document.getElementById('root').innerHTML += '<div class="container movie-container"><div class="row"><div class="col-md-9"><div class="card movie-card bg-transparent border-0"><div class="card-body col-md-8"><h5 class="card-title">' + currentValue.title + '</h5><p class="card-text">' + currentValue.description + '</p><a href="reserve.html?id=' + currentValue.id + '" class="btn btn-primary">Kup bilet</a></div></div></div></div></div>';
         })
       })
       .catch(error => {

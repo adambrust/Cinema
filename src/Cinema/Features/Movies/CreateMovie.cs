@@ -11,8 +11,7 @@ namespace Cinema.Features.Movies;
 public sealed record CreateMovieRequest(
     string Title,
     string Description,
-    DateTime Time,
-    string Image)
+    DateTime Time)
     : IRequest<IResult>;
 
 public sealed class CreateMovieRequestValidator : AbstractValidator<CreateMovieRequest>
@@ -23,7 +22,6 @@ public sealed class CreateMovieRequestValidator : AbstractValidator<CreateMovieR
         RuleFor(c => c.Description).NotEmpty();
         RuleFor(c => c.Time).NotEmpty();
         RuleFor(c => c.Time).GreaterThan(dateTime.UtcNow);
-        RuleFor(c => c.Image).NotEmpty();
     }
 }
 
@@ -45,7 +43,6 @@ public sealed class CreateMovieRequestHandler(CinemaDbContext db, IValidator<Cre
             Title = request.Title,
             Description = request.Description,
             Time = request.Time,
-            Image = request.Image,
         };
 
         await db.Movies.AddAsync(movie, cancellationToken);
